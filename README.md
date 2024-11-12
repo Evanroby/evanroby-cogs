@@ -1,6 +1,6 @@
 # Evanroby Cogs - Installation Guide
 
-This guide will walk you through installing and loading cogs from the **Evanroby-Cogs** repository on your Red-Discord Bot.
+This guide will walk you through installing and loading cogs from the **Evanroby-cogs** repository on your Red-Discord Bot.
 
 ---
 
