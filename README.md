@@ -1,26 +1,59 @@
-## Installation
+# Evanroby Cogs - Installation Guide
 
-> Make sure that you have downloader loaded.
+This guide will walk you through installing and loading cogs from the **Evanroby-Cogs** repository on your Red-Discord Bot.
+
+---
+
+## Prerequisites
+
+Before you begin, ensure that you have the `downloader` module loaded on your Red instance.
+
 ```py
 [p]load downloader
 ```
 
-> Add `Evanroby-Cogs` to your Red-Discord Bot.
+---
+
+## Step 1: Add the `Evanroby-cogs` Repository
+
+To access cogs from My collection, add the repository to your Red instance:
+
 ```py
 [p]repo add Evanroby-cogs https://github.com/Evanroby/evanroby-cogs/
 ```
 
-> Install cog(s) from `Evanroby-Cogs` in your Red instance
-```py
-[p]cog install Evanroby-Cogs <CogName>
-```
-> [!NOTE]
-> Make sure to replace <CogName> by the actual name of the cog you want!
+---
 
-> Load the cog(s).
+## Step 2: Install the Desired Cog(s)
+
+Now that the repository is added, you can install the cog(s) you want:
+
+```py
+[p]cog install Evanroby-cogs <CogName>
+```
+
+> **Note:**  
+> Replace `<CogName>` with the exact name of the cog you wish to install.
+
+---
+
+## Step 3: Load the Installed Cog(s)
+
+After installing, load the cog to activate it in your bot:
+
 ```py
 [p]load CogName
 ```
 
-> [!NOTE]
-> `[p]` is your prefix.
+> **Note:**  
+> - Ensure you replace `CogName` with the name of the cog you just installed.
+> - `[p]` represents your bot's prefix (e.g., `!`, `?`, or any custom prefix you set).
+
+---
+
+## Additional Information
+
+- For a full list of available cogs, visit the [Evanroby-cogs GitHub repository](https://github.com/Evanroby/evanroby-cogs/).
+- If you encounter any issues or need support, feel free to open an issue on GitHub.
+## Special Credits
+- Thank you to everyone in the official [red server](https://discord.gg/red) for making me discover red, or guiding me on the other cogs.
