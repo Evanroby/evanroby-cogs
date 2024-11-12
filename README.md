@@ -2,7 +2,7 @@
 
 This guide will walk you through installing and loading cogs from the **Evanroby-cogs** repository on your Red-Discord Bot.
 > [!IMPORTANT]
-> For support, you can join the official [`Red Cog Support`](https://discord.gg/GET4DVk) server. You can get help on any cogs and any repos in [`#support_othercogs`)(https://discord.com/channels/240154543684321280/240212783503900673)
+> For support, you can join the official [`Red Cog Support`](https://discord.gg/GET4DVk) server. You can get help on any cogs and any repos in [`#support_othercogs`](https://discord.com/channels/240154543684321280/240212783503900673).
 ---
 
 ## Prerequisites
