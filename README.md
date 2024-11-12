@@ -55,6 +55,6 @@ After installing, load the cog to activate it in your bot:
 ## Additional Information
 
 - For a full list of available cogs, visit the [Evanroby-cogs GitHub repository](https://github.com/Evanroby/evanroby-cogs/).
-- If you encounter any issues or need support, feel free to open an issue on GitHub.
+- If you encounter any issues or need support, feel free to open an issue on GitHub or through the important tab all the way up.
 ## Special Credits
 - Thank you to everyone in the official [red server](https://discord.gg/red) for making me discover red, or guiding me on the other cogs.
