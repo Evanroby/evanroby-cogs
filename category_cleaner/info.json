@@ -1,0 +1,17 @@
+{
+    "author": ["Evanroby"],
+    "name": "CategoryCleaner",
+    "install_msg": "Thank you for installing the Category Cleaner cog!",
+    "short": "Remove all channels within a category.",
+    "description": "Remove all channels of a category with the category'd id.",
+    "tags": [
+        "clean",
+        "channel",
+        "category",
+        "cleaner",
+        "moderation"
+    ],
+    "requirements": [""],
+    "min_bot_version": "3.5.0",
+    "end_user_data_statement": "This cog does not store data about users."
+}
