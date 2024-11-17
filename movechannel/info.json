@@ -1,0 +1,17 @@
+{
+    "author": ["Evanroby"],
+    "name": "MoveChannel",
+    "install_msg": "Thank you for installing the MoveChannel cog!",
+    "short": "Revert channel movements from the audit logs.",
+    "description": "Revert and restore channels that were moved in servers using the audit logs.",
+    "tags": [
+        "move",
+        "channel",
+        "revert",
+        "audit",
+        "log"
+    ],
+    "requirements": [""],
+    "min_bot_version": "3.5.0",
+    "end_user_data_statement": "This cog does not store data about users."
+}
