@@ -1,0 +1,8 @@
+{
+    "author" : ["Evanroby"],
+    "install_msg" : "Thank you for installing my repo! If you need support, ping me in the [`Red Cog Support`]( https://discord.gg/GET4DVk ) server. You can get help on any cogs and any repos in [`#support_othercogs`](https://discord.com/channels/240154543684321280/240212783503900673).",
+    "name" : "Evanroby-cogs",
+    "short" : "Red-DiscordBot cogs",
+    "description" : "Alot of cogs made by heart for Red-DiscordBot!",
+    "tags" : ["utility", "moderation", "Fun"]
+}
