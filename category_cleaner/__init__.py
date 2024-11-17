@@ -1,8 +1,6 @@
 from redbot.core.bot import Red
 
-from .core import FirstMessage
+from .category_cleaner import CategoryCleaner
 
-
-async def setup(bot: Red) -> None:
-    cog = FirstMessage(bot)
-    await bot.add_cog(cog)
+async def setup(bot: Red):
+    await bot.add_cog(CategoryCleaner(bot))
