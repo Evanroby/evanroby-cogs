@@ -4,7 +4,6 @@ from redbot.core.i18n import Translator, cog_i18n
 import discord
 import typing
 
-# Set up translation and localization
 _: Translator = Translator("MoveChannel", __file__)
 
 @cog_i18n(_)
@@ -13,7 +12,7 @@ class MoveChannel(commands.Cog):
 
     def __init__(self, bot: Red):
         self.bot = bot
-        self.config = Config.get_conf(self, identifier=1234567890, force_registration=True)
+        self.config = Config.get_conf(self, identifier=6452384762, force_registration=True)
         self.config.register_guild()
 
     async def get_category(self, guild: discord.Guild, category_name_or_id: typing.Union[str, int]) -> typing.Optional[discord.CategoryChannel]:
