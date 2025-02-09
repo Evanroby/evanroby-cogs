@@ -1,0 +1,8 @@
+{
+  "author": ["evanroby"],
+  "description": "Usage: [p]gaymeter <user>\nThis command tells you how gay a user is, with 100% accuracy!",
+  "short": "Measures a user's gayness with extreme precision.",
+  "name": "GayMeter",
+  "tags": ["fun", "random"],
+  "min_bot_version": "3.5.0"
+}
