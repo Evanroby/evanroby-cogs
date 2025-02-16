@@ -5,16 +5,6 @@ This guide will walk you through installing and loading cogs from the **Evanroby
 > For support, you can join the official [`Red Cog Support`](https://discord.gg/GET4DVk) server. You can get help on any cogs and any repos in [`#support_othercogs`](https://discord.com/channels/240154543684321280/240212783503900673).
 ---
 
-## Prerequisites
-
-Before you begin, ensure that you have the `downloader` module loaded on your Red instance.
-
-```py
-[p]load downloader
-```
-
----
-
 ## Step 1: Add the `Evanroby-cogs` Repository
 
 To access cogs from my collection, add the repository to your Red instance:
