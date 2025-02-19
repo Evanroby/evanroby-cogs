@@ -1,0 +1,11 @@
+{
+    "name": "enterexit",
+    "author": ["evanroby"],
+    "description": "A simple cog that announces when users enter or exit the chat.",
+    "install_msg": "Thank you for installing EnterExit! Use `[p]help EnterExit` for commands.",
+    "requirements": [],
+    "tags": ["fun", "utility", "chat"],
+    "min_bot_version": "3.4.0",
+    "hidden": false,
+    "disabled": false
+}
