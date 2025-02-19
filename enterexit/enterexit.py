@@ -6,7 +6,7 @@ class EnterExit(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
-        self.config = Config.get_conf(self, identifier=987654321)
+        self.config = Config.get_conf(self, identifier=43251647568)
         self.config.register_guild(required_role=None, enter_emoji="👋", exit_emoji="🚪")
 
     async def has_required_role(self, ctx):
