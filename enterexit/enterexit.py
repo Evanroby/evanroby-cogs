@@ -13,16 +13,16 @@ class EnterExit(commands.Cog):
         """Check if user has the required role"""
         role_id = await self.config.guild(ctx.guild).required_role()
         if role_id is None:
-            return True  # No role required
+            return True
         role = discord.utils.get(ctx.guild.roles, id=role_id)
         return role in ctx.author.roles if role else False
 
     async def can_use_emoji(self, ctx, emoji: str):
         """Check if bot can send the given emoji"""
-        if emoji.startswith("<") and emoji.endswith(">"):  # Custom emoji format
-            emoji_id = emoji.split(":")[-1][:-1]  # Extract emoji ID
+        if emoji.startswith("<") and emoji.endswith(">"):  
+            emoji_id = emoji.split(":")[-1][:-1]  
             return discord.utils.get(ctx.guild.emojis, id=int(emoji_id)) is not None
-        return True  # Standard emojis are always usable
+        return True  
 
     @commands.guild_only()
     @commands.command(name="enter")
@@ -33,7 +33,7 @@ class EnterExit(commands.Cog):
         
         enter_emoji = await self.config.guild(ctx.guild).enter_emoji()
         if not await self.can_use_emoji(ctx, enter_emoji):
-            enter_emoji = "👋"  # Fallback to default
+            enter_emoji = "👋"  
         
         await ctx.send(f"**{user.mention}** **entered the chat** {enter_emoji}")
 
@@ -46,7 +46,7 @@ class EnterExit(commands.Cog):
         
         exit_emoji = await self.config.guild(ctx.guild).exit_emoji()
         if not await self.can_use_emoji(ctx, exit_emoji):
-            exit_emoji = "🚪"  # Fallback to default
+            exit_emoji = "🚪"  
         
         await ctx.send(f"**{user.mention}** **exited the chat** {exit_emoji}")
 
