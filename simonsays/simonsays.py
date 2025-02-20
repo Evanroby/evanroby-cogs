@@ -2,8 +2,9 @@ import discord
 import random
 from redbot.core import commands
 from redbot.core.bot import Red
-from redbot.core.utils.chat_formatting import bold
-from typing import Dict, Optional
+from .converters import RoundsConverter, BoolConverter
+from .utils import get_random_command, format_leaderboard, check_response
+from typing import Dict
 
 class SimonSays(commands.Cog):
     """A fun Simon Says game with scoring, rounds, and elimination mode!"""
@@ -13,7 +14,7 @@ class SimonSays(commands.Cog):
         self.active_games = {}
 
     @commands.hybrid_command(name="simonsays", with_app_command=True)
-    async def simonsays(self, ctx: commands.Context, rounds: Optional[int] = 5, elimination: Optional[bool] = False):
+    async def simonsays(self, ctx: commands.Context, rounds: RoundsConverter = 5, elimination: BoolConverter = False):
         """
         Start a Simon Says game!
         - `rounds`: Number of rounds (default: 5)
@@ -32,7 +33,7 @@ class SimonSays(commands.Cog):
                 return  
 
             simon_says = random.choice([True, False])
-            action = random.choice(["jump", "wave", "clap", "spin", "sit", "dance"])
+            action = get_random_command()
             message = f"**Simon says {action}!**" if simon_says else f"**{action}!**"
             await ctx.send(f"🕹️ Round {i}/{rounds}: {message}")
 
@@ -47,11 +48,6 @@ class SimonSays(commands.Cog):
 
         await self._end_game(ctx)
 
-    @commands.command(name="simonsays_prefix")
-    async def simonsays_prefix(self, ctx: commands.Context, rounds: Optional[int] = 5, elimination: Optional[bool] = False):
-        """Start Simon Says using a prefix command."""
-        await self.simonsays(ctx, rounds, elimination)
-
     async def _get_responses(self, ctx: commands.Context, action: str, simon_says: bool):
         """Collects player responses and returns valid ones."""
         responses = {}
@@ -62,7 +58,7 @@ class SimonSays(commands.Cog):
         try:
             while True:
                 msg = await self.bot.wait_for("message", check=check, timeout=5.0)
-                if msg.author.id not in responses:  
+                if msg.author.id not in responses:
                     responses[msg.author.id] = msg.content.lower()
         except:
             pass  
@@ -75,15 +71,10 @@ class SimonSays(commands.Cog):
         players = game["players"]
 
         for user_id, response in responses.items():
-            if simon_says and response != "simon says":
+            if not check_response(response, get_random_command(), simon_says):
                 if elimination:
                     del players[user_id]
                 continue  
-
-            if not simon_says and response == "simon says":
-                if elimination:
-                    del players[user_id]
-                continue 
 
             if user_id in players:
                 players[user_id] += 1
@@ -98,13 +89,7 @@ class SimonSays(commands.Cog):
         game = self.active_games.pop(ctx.channel.id)
         players = game["players"]
 
-        if not players:
-            await ctx.send("Game over! No one won this time. 😢")
-            return
-
-        leaderboard = sorted(players.items(), key=lambda x: x[1], reverse=True)
-        results = "\n".join([f"🥇 **<@{p[0]}>** - {p[1]} points" for p in leaderboard])
-        await ctx.send(f"🏆 **Game Over!**\n{results}")
+        await ctx.send(f"🏆 **Game Over!**\n{format_leaderboard(players)}")
 
     @commands.hybrid_command(name="stop_simon", with_app_command=True)
     async def stop_simon(self, ctx: commands.Context):
@@ -114,11 +99,6 @@ class SimonSays(commands.Cog):
             await ctx.send("❌ Simon Says game has been stopped.")
         else:
             await ctx.send("No Simon Says game is currently running.")
-
-    @commands.command(name="stop_simon_prefix")
-    async def stop_simon_prefix(self, ctx: commands.Context):
-        """Stops the Simon Says game using a prefix command."""
-        await self.stop_simon(ctx)
 
 async def setup(bot: Red):
     await bot.add_cog(SimonSays(bot))
