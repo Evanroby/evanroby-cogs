@@ -4,7 +4,43 @@ from redbot.core import commands
 from redbot.core.bot import Red
 from .converters import RoundsConverter, BoolConverter
 from .utils import get_random_command, format_leaderboard, check_response
-from typing import Dict
+from typing import Dict, List
+
+class JoinButton(discord.ui.View):
+    """View with a button to join the Simon Says game."""
+    
+    def __init__(self, cog, ctx):
+        super().__init__(timeout=10)
+        self.cog = cog
+        self.ctx = ctx
+        self.players = []
+
+    @discord.ui.button(label="Join Game", style=discord.ButtonStyle.green)
+    async def join_game(self, interaction: discord.Interaction, button: discord.ui.Button):
+        """Handles the player clicking the join button."""
+        user = interaction.user
+        if user in self.players:
+            await interaction.response.send_message("You're already in the game!", ephemeral=True)
+            return
+
+        self.players.append(user)
+        await interaction.response.send_message("✅ You have joined the game! Check your DMs for instructions. 📩", ephemeral=True)
+        
+        try:
+            dm_embed = discord.Embed(
+                title="🎤 Simon Says - How to Play",
+                description="Here are the rules so you're ready to play:",
+                color=discord.Color.blue()
+            )
+            dm_embed.add_field(name="📌 Basic Rules", value="Only follow commands that start with **'Simon says'**.\nIf Simon **doesn't** say it, **DO NOT** follow the action!", inline=False)
+            dm_embed.add_field(name="🔥 Elimination Mode", value="If enabled, you're **out** if you make a mistake!", inline=False)
+            dm_embed.add_field(name="🏆 Winning", value="Players score points for following correct commands. The **highest scorer wins**!", inline=False)
+            dm_embed.add_field(name="🎮 Game Flow", value="1. The game starts and players follow instructions.\n2. Each round, Simon will give a command.\n3. Type the exact action if **'Simon says'** is included.\n4. The player with the highest score at the end wins!", inline=False)
+            dm_embed.set_footer(text="The game will start soon...")
+
+            await user.send(embed=dm_embed)
+        except discord.Forbidden:
+            pass  
 
 class SimonSays(commands.Cog):
     """A fun Simon Says game with scoring, rounds, and elimination mode!"""
@@ -14,7 +50,7 @@ class SimonSays(commands.Cog):
         self.active_games = {}
 
     async def cog_load(self):
-        """Sync slash commands on cog load."""
+        """Syncs slash commands when the cog loads."""
         await self.bot.tree.sync()
 
     @commands.hybrid_command(name="simonsays", with_app_command=True)
@@ -28,9 +64,29 @@ class SimonSays(commands.Cog):
             await ctx.send("A Simon Says game is already running in this channel!")
             return
 
-        self.active_games[ctx.channel.id] = {"players": {}, "rounds": rounds, "elimination": elimination}
+        embed = discord.Embed(
+            title="🎤 Simon Says - Game Instructions",
+            description="Follow Simon's commands correctly to win! Click **Join Game** below to enter.",
+            color=discord.Color.blue()
+        )
+        embed.add_field(name="📌 Basic Rules", value="Only follow commands that start with **'Simon says'**.\nIf Simon **doesn't** say it, **DO NOT** follow the action!", inline=False)
+        embed.add_field(name="🔥 Elimination Mode", value="If enabled, you're **out** if you make a mistake!", inline=False)
+        embed.add_field(name="🏆 Winning", value="Players score points for following correct commands.\nThe **highest scorer wins**!", inline=False)
+        embed.set_footer(text="Click the button below to join!")
 
-        await ctx.send(f"🎤 **Simon Says** is starting! {rounds} rounds, {'Elimination Mode' if elimination else 'Normal Mode'}!")
+        view = JoinButton(self, ctx)
+        msg = await ctx.send(embed=embed, view=view)
+
+        await view.wait()
+
+        if len(view.players) < 2:
+            await ctx.send("Not enough players joined. The game has been cancelled. 😢")
+            return
+
+        players = view.players
+        self.active_games[ctx.channel.id] = {"players": {p.id: 0 for p in players}, "rounds": rounds, "elimination": elimination}
+
+        await ctx.send(f"🎤 **Game Starting!** {rounds} rounds, {'Elimination Mode' if elimination else 'Normal Mode'}!")
 
         for i in range(1, rounds + 1):
             if ctx.channel.id not in self.active_games:
@@ -39,11 +95,16 @@ class SimonSays(commands.Cog):
             simon_says = random.choice([True, False])
             action = get_random_command()
             message = f"**Simon says {action}!**" if simon_says else f"**{action}!**"
-            await ctx.send(f"🕹️ Round {i}/{rounds}: {message}")
+            await ctx.send(f"🕹️ **Round {i}/{rounds}:** {message}")
 
             try:
-                responses = await self._get_responses(ctx, action, simon_says)
-                self._update_scores(ctx.channel.id, responses, simon_says, elimination)
+                responses = await self._get_responses(ctx, players, action, simon_says)
+                round_winners = self._update_scores(ctx.channel.id, responses, simon_says, elimination)
+                
+                if round_winners:
+                    winner_mentions = ", ".join([f"<@{winner}>" for winner in round_winners])
+                    await ctx.send(f"🏆 {winner_mentions} won this round!")
+
             except:
                 await ctx.send("⏳ No one responded in time!")
 
@@ -52,27 +113,12 @@ class SimonSays(commands.Cog):
 
         await self._end_game(ctx)
 
-    @commands.hybrid_command(name="simonsays_explain", with_app_command=True)
-    async def simonsays_explain(self, ctx: commands.Context):
-        """Explains how to play Simon Says."""
-        embed = discord.Embed(
-            title="🎤 How to Play Simon Says",
-            description="Follow the rules to win the game!",
-            color=discord.Color.blue()
-        )
-        embed.add_field(name="📌 Basic Rules", value="Type **'Simon says <action>'** if Simon says it!\nIf Simon **doesn't** say 'Simon says', **DO NOT** follow the action!", inline=False)
-        embed.add_field(name="🔥 Elimination Mode", value="If enabled, you are eliminated when you make a mistake!", inline=False)
-        embed.add_field(name="🏆 Winning", value="Score points by following correct commands. The player with the highest score wins!", inline=False)
-        embed.set_footer(text="Use ,simonsays or /simonsays to start a game!")
-
-        await ctx.send(embed=embed)
-
-    async def _get_responses(self, ctx: commands.Context, action: str, simon_says: bool):
-        """Collects player responses and returns valid ones."""
+    async def _get_responses(self, ctx: commands.Context, players: List[discord.Member], action: str, simon_says: bool):
+        """Collects valid responses from joined players only."""
         responses = {}
 
         def check(m):
-            return m.channel == ctx.channel and m.author != self.bot
+            return m.channel == ctx.channel and m.author in players
 
         try:
             while True:
@@ -80,14 +126,15 @@ class SimonSays(commands.Cog):
                 if msg.author.id not in responses:
                     responses[msg.author.id] = msg.content.lower()
         except:
-            pass 
+            pass  
 
         return responses
 
     def _update_scores(self, channel_id: int, responses: Dict[int, str], simon_says: bool, elimination: bool):
-        """Updates scores and handles elimination mode."""
+        """Updates scores and announces round winners."""
         game = self.active_games[channel_id]
         players = game["players"]
+        round_winners = []
 
         for user_id, response in responses.items():
             if not check_response(response, get_random_command(), simon_says):
@@ -95,10 +142,10 @@ class SimonSays(commands.Cog):
                     del players[user_id]
                 continue  
 
-            if user_id in players:
-                players[user_id] += 1
-            else:
-                players[user_id] = 1
+            players[user_id] += 1
+            round_winners.append(user_id)
+
+        return round_winners
 
     async def _end_game(self, ctx: commands.Context):
         """Ends the game and displays the leaderboard."""
@@ -110,15 +157,5 @@ class SimonSays(commands.Cog):
 
         await ctx.send(f"🏆 **Game Over!**\n{format_leaderboard(players)}")
 
-    @commands.hybrid_command(name="stop_simon", with_app_command=True)
-    async def stop_simon(self, ctx: commands.Context):
-        """Stops the ongoing Simon Says game."""
-        if ctx.channel.id in self.active_games:
-            del self.active_games[ctx.channel.id]
-            await ctx.send("❌ Simon Says game has been stopped.")
-        else:
-            await ctx.send("No Simon Says game is currently running.")
-
 async def setup(bot: Red):
     await bot.add_cog(SimonSays(bot))
-    
