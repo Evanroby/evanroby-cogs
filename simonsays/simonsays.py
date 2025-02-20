@@ -121,3 +121,4 @@ class SimonSays(commands.Cog):
 
 async def setup(bot: Red):
     await bot.add_cog(SimonSays(bot))
+    
