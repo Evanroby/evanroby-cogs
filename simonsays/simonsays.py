@@ -13,6 +13,10 @@ class SimonSays(commands.Cog):
         self.bot = bot
         self.active_games = {}
 
+    async def cog_load(self):
+        """Sync slash commands on cog load."""
+        await self.bot.tree.sync()
+
     @commands.hybrid_command(name="simonsays", with_app_command=True)
     async def simonsays(self, ctx: commands.Context, rounds: RoundsConverter = 5, elimination: BoolConverter = False):
         """
@@ -48,6 +52,21 @@ class SimonSays(commands.Cog):
 
         await self._end_game(ctx)
 
+    @commands.hybrid_command(name="simonsays_explain", with_app_command=True)
+    async def simonsays_explain(self, ctx: commands.Context):
+        """Explains how to play Simon Says."""
+        embed = discord.Embed(
+            title="🎤 How to Play Simon Says",
+            description="Follow the rules to win the game!",
+            color=discord.Color.blue()
+        )
+        embed.add_field(name="📌 Basic Rules", value="Type **'Simon says <action>'** if Simon says it!\nIf Simon **doesn't** say 'Simon says', **DO NOT** follow the action!", inline=False)
+        embed.add_field(name="🔥 Elimination Mode", value="If enabled, you are eliminated when you make a mistake!", inline=False)
+        embed.add_field(name="🏆 Winning", value="Score points by following correct commands. The player with the highest score wins!", inline=False)
+        embed.set_footer(text="Use ,simonsays or /simonsays to start a game!")
+
+        await ctx.send(embed=embed)
+
     async def _get_responses(self, ctx: commands.Context, action: str, simon_says: bool):
         """Collects player responses and returns valid ones."""
         responses = {}
@@ -61,7 +80,7 @@ class SimonSays(commands.Cog):
                 if msg.author.id not in responses:
                     responses[msg.author.id] = msg.content.lower()
         except:
-            pass  
+            pass 
 
         return responses
 
