@@ -1,0 +1,9 @@
+{
+    "author": ["evanroby"],
+    "description": "A simple Simon Says game for Red Discord Bot.",
+    "install_msg": "Thanks for installing Simon Says! Use `/simonsays start` to play.",
+    "required_cogs": [],
+    "requirements": [],
+    "tags": ["game", "fun", "simon says"],
+    "type": "COG"
+}
