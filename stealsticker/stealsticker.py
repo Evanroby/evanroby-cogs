@@ -1,6 +1,7 @@
 from redbot.core import commands
 import discord
 import random
+import io
 
 class StealSticker(commands.Cog):
     """Steal a sticker from a message and add it to the guild."""
@@ -33,6 +34,9 @@ class StealSticker(commands.Cog):
             if sticker.url.endswith(".json"):
                 return await ctx.send("⚠️ That is not a valid sticker file.")
 
+            sticker_bytes = await sticker.read()
+            sticker_file = discord.File(io.BytesIO(sticker_bytes), filename=f"{sticker.name}.png")
+
             guild_emojis = ctx.guild.emojis
             emoji = str(random.choice(guild_emojis)) if guild_emojis else "🔥"
 
@@ -40,7 +44,7 @@ class StealSticker(commands.Cog):
                 created = await ctx.guild.create_sticker(
                     name=sticker.name,
                     description=getattr(sticker, 'description', ""),
-                    file=await sticker.read(),
+                    file=sticker_file,
                     emoji=emoji  
                 )
                 await ctx.send(f"✅ Created your sticker using the name **{created.name}** with emoji {emoji}!")
