@@ -1,5 +1,6 @@
 from redbot.core import commands
 import discord
+import random
 
 class StealSticker(commands.Cog):
     """Steal a sticker from a message and add it to the guild."""
@@ -32,13 +33,17 @@ class StealSticker(commands.Cog):
             if sticker.url.endswith(".json"):
                 return await ctx.send("⚠️ That is not a valid sticker file.")
 
+            guild_emojis = ctx.guild.emojis
+            emoji = str(random.choice(guild_emojis)) if guild_emojis else "🔥"
+
             try:
                 created = await ctx.guild.create_sticker(
                     name=sticker.name,
                     description=getattr(sticker, 'description', ""),
-                    file=await sticker.read()
+                    file=await sticker.read(),
+                    emoji=emoji  
                 )
-                await ctx.send(f"✅ Created your sticker using the name **{created.name}**!")
+                await ctx.send(f"✅ Created your sticker using the name **{created.name}** with emoji {emoji}!")
             except discord.HTTPException as err:
                 if err.code == 30039:  
                     await ctx.send("⚠️ Your guild has reached the **sticker limit**.")
