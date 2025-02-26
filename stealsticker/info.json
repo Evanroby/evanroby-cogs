@@ -1,0 +1,8 @@
+{
+  "name": "StealSticker",
+  "author": ["evanroby"],
+  "description": "A cog to steal stickers from messages and add them to the server.",
+  "install_msg": "Thanks for installing StealSticker! Use `[p]stealsticker <message_id>`. If you have any issue, feel free to dm @evanroby!",
+  "requirements": [],
+  "tags": ["stickers", "utility"]
+}
