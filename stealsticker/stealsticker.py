@@ -35,7 +35,7 @@ class StealSticker(commands.Cog):
             try:
                 created = await ctx.guild.create_sticker(
                     name=sticker.name,
-                    description=sticker.description or "",
+                    description=getattr(sticker, 'description', ""),
                     tags=sticker.tags,
                     file=await sticker.read()
                 )
