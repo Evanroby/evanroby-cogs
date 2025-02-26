@@ -36,7 +36,6 @@ class StealSticker(commands.Cog):
                 created = await ctx.guild.create_sticker(
                     name=sticker.name,
                     description=getattr(sticker, 'description', ""),
-                    tags=sticker.tags,
                     file=await sticker.read()
                 )
                 await ctx.send(f"✅ Created your sticker using the name **{created.name}**!")
