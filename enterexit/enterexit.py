@@ -60,7 +60,7 @@ class EnterExit(commands.Cog):
     @commands.guild_only()
     @commands.command(name="setrequiredrole")
     async def set_required_role(self, ctx, role: discord.Role = None):
-        """Set a required role for enter/exit commands (Server Owner Only)."""
+        """Set a required role for enter/exit commands."""
         if not await self.is_guild_owner(ctx):
             return
         await self.config.guild(ctx.guild).required_role.set(role.id if role else None)
@@ -72,7 +72,7 @@ class EnterExit(commands.Cog):
     @commands.guild_only()
     @commands.command(name="setenteremoji")
     async def set_enter_emoji(self, ctx, emoji: str):
-        """Set a custom emoji for the enter command (Server Owner Only)."""
+        """Set a custom emoji for the enter command."""
         if not await self.is_guild_owner(ctx):
             return
         if not await self.can_use_emoji(ctx, emoji):
@@ -83,7 +83,7 @@ class EnterExit(commands.Cog):
     @commands.guild_only()
     @commands.command(name="setexitemoji")
     async def set_exit_emoji(self, ctx, emoji: str):
-        """Set a custom emoji for the exit command (Server Owner Only)."""
+        """Set a custom emoji for the exit command."""
         if not await self.is_guild_owner(ctx):
             return
         if not await self.can_use_emoji(ctx, emoji):
