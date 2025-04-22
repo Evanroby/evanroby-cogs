@@ -11,11 +11,11 @@ class StealSticker(commands.Cog):
 
     async def cog_load(self):
         """Called when the cog is loaded."""
-        print("StealSticker cog has been loaded.")
+        pass
 
     async def cog_unload(self):
         """Called when the cog is unloaded."""
-        print("StealSticker cog has been unloaded.")
+        pass
 
     @commands.command(name="stealsticker")
     @commands.guild_only()
