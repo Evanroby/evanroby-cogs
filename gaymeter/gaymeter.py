@@ -12,11 +12,10 @@ class GayMeter(commands.Cog):
         
         If no user is mentioned, it defaults to the command author."""
         
-        user = user or ctx.author  # Default to author if no user is mentioned
-        random.seed(str(user.id))  # Ensures consistent results per user
+        user = user or ctx.author  
+        random.seed(str(user.id))  
         gay_percentage = random.randint(0, 100)
 
-        # Custom messages based on percentage
         if gay_percentage < 25:
             message = "You're about as straight as a ruler! 📏"
         elif gay_percentage < 50:
