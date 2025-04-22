@@ -1,4 +1,4 @@
-name: Send Commit Message to Discord
+name: Discord GitHub Push Webhook
 
 on:
   push:
@@ -6,23 +6,35 @@ on:
       - main  
 
 jobs:
-  discord:
+  send_to_discord:
     runs-on: ubuntu-latest
     steps:
-      - name: Post commit to Discord
+      - name: Send GitHub commit to Discord
         env:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
-          COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
+          REPO_NAME: ${{ github.repository }}
+          BRANCH_NAME: ${{ github.ref_name }}
+          AUTHOR_NAME: ${{ github.event.head_commit.author.name }}
+          AUTHOR_AVATAR: https://github.com/${{ github.actor }}.png
+          COMMIT_MSG: ${{ github.event.head_commit.message }}
           COMMIT_URL: ${{ github.event.head_commit.url }}
-          AUTHOR: ${{ github.event.head_commit.author.name }}
+          COMMIT_HASH: ${{ github.event.head_commit.id }}
         run: |
+          SHORT_HASH=$(echo $COMMIT_HASH | cut -c1-7)
           curl -H "Content-Type: application/json" \
           -X POST \
           -d '{
+            "username": "GitHub",
+            "avatar_url": "https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png",
             "embeds": [{
-              "title": "📝 New Commit by '"$AUTHOR"'",
-              "description": "**'"$COMMIT_MESSAGE"'**\n[View Commit]('"$COMMIT_URL"')",
-              "color": 5814783
+              "author": {
+                "name": "'"$AUTHOR_NAME"'",
+                "icon_url": "'"$AUTHOR_AVATAR"'"
+              },
+              "title": "[${REPO_NAME##*/}:$BRANCH_NAME] 1 new commit",
+              "url": "'"$COMMIT_URL"'",
+              "color": 7506394,
+              "description": "```"'"$SHORT_HASH"'``` Fix for ratelimit – '"$AUTHOR_NAME"'"
             }]
           }' \
           $DISCORD_WEBHOOK
