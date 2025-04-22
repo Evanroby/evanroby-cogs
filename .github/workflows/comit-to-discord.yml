@@ -1,0 +1,28 @@
+name: Send Commit Message to Discord
+
+on:
+  push:
+    branches:
+      - main  
+
+jobs:
+  discord:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Post commit to Discord
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+          COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
+          COMMIT_URL: ${{ github.event.head_commit.url }}
+          AUTHOR: ${{ github.event.head_commit.author.name }}
+        run: |
+          curl -H "Content-Type: application/json" \
+          -X POST \
+          -d '{
+            "embeds": [{
+              "title": "📝 New Commit by '"$AUTHOR"'",
+              "description": "**'"$COMMIT_MESSAGE"'**\n[View Commit]('"$COMMIT_URL"')",
+              "color": 5814783
+            }]
+          }' \
+          $DISCORD_WEBHOOK
