@@ -6,7 +6,6 @@ import typing
 
 _: Translator = Translator("MoveChannel", __file__)
 
-@cog_i18n(_)
 class MoveChannel(commands.Cog):
     """Manage and move channels across categories."""
 
