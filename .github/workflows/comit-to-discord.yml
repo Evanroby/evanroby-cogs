@@ -30,24 +30,20 @@ jobs:
             COMMIT_HASH=$(echo "$commit" | jq -r '.id' | cut -c1-7)
             AUTHOR_NAME=$(echo "$commit" | jq -r '.author.name')
 
-            payload=$(
-              cat <<-EOF
-                {
-                  "username": "GitHub",
-                  "avatar_url": "https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png",
-                  "embeds": [{
-                    "author": {
-                      "name": "${AUTHOR_NAME}",
-                      "icon_url": "${AUTHOR_AVATAR}"
-                    },
-                    "title": "[${REPO_NAME##*/}:${BRANCH_NAME}] ${count} new commit(s)",
-                    "url": "${COMMIT_URL}",
-                    "color": 7506394,
-                    "description": "\`\`\`$COMMIT_HASH\`\`\`\n${COMMIT_MSG} – ${AUTHOR_NAME}"
-                  }]
-                }
-              EOF
-            )
+            payload='{
+              "username": "GitHub",
+              "avatar_url": "https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png",
+              "embeds": [{
+                "author": {
+                  "name": "'"${AUTHOR_NAME}"'",
+                  "icon_url": "'"${AUTHOR_AVATAR}"'"
+                },
+                "title": "['"${REPO_NAME##*/}"':'"${BRANCH_NAME}"'] '"${count}"' new commit(s)",
+                "url": "'"${COMMIT_URL}"'",
+                "color": 7506394,
+                "description": "```'"${COMMIT_HASH}"'```\n'"${COMMIT_MSG}"' – '"${AUTHOR_NAME}"'"
+              }]
+            }'
 
             curl -s -H "Content-Type: application/json" \
               -X POST \
