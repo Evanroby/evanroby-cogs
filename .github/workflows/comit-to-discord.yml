@@ -46,7 +46,7 @@ jobs:
   }]
 }
 EOF
-)
+            )
 
             curl -s -H "Content-Type: application/json" \
               -X POST \
