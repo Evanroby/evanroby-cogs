@@ -14,7 +14,7 @@ jobs:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
           REPO_NAME: ${{ github.repository }}
           BRANCH_NAME: ${{ github.ref_name }}
-          AUTHOR_AVATAR: https://github.com/${{ github.actor }}.png
+          AUTHOR_NAME: ${{ github.actor }}
         run: |
           commits=$(jq -c '.commits[]?' "$GITHUB_EVENT_PATH" || echo "")
           if [ -z "$commits" ]; then
@@ -22,26 +22,22 @@ jobs:
             exit 0
           fi
 
-          count=$(echo "$commits" | wc -l)
-
           echo "$commits" | while IFS= read -r commit; do
             COMMIT_MSG=$(echo "$commit" | jq -r '.message')
             COMMIT_URL=$(echo "$commit" | jq -r '.url')
             COMMIT_HASH=$(echo "$commit" | jq -r '.id' | cut -c1-7)
-            AUTHOR_NAME=$(echo "$commit" | jq -r '.author.name')
 
             payload='{
               "username": "GitHub",
               "avatar_url": "https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png",
               "embeds": [{
                 "author": {
-                  "name": "'"${AUTHOR_NAME}"'",
-                  "icon_url": "'"${AUTHOR_AVATAR}"'"
+                  "name": "'"${AUTHOR_NAME}"'"
                 },
-                "title": "['"${REPO_NAME##*/}"':'"${BRANCH_NAME}"'] '"${count}"' new commit(s)",
+                "title": "[${REPO_NAME##*/}:${BRANCH_NAME}] 1 new commit",
                 "url": "'"${COMMIT_URL}"'",
                 "color": 7506394,
-                "description": "```'"${COMMIT_HASH}"'```\n'"${COMMIT_MSG}"' – '"${AUTHOR_NAME}"'"
+                "description": "'"${COMMIT_HASH}"' | '"${COMMIT_MSG}"' - '"${AUTHOR_NAME}"'"
               }]
             }'
 
