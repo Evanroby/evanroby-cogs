@@ -9,35 +9,47 @@ jobs:
   send_to_discord:
     runs-on: ubuntu-latest
     steps:
-      - name: Loop through commits and send embed
+      - name: Parse commits and send embeds
         env:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
           REPO_NAME: ${{ github.repository }}
           BRANCH_NAME: ${{ github.ref_name }}
           AUTHOR_AVATAR: https://github.com/${{ github.actor }}.png
         run: |
-          commits=$(jq -c '.commits[]' "$GITHUB_EVENT_PATH")
+          echo "🪵 Raw GitHub event path: $GITHUB_EVENT_PATH"
+          cat "$GITHUB_EVENT_PATH"
+
+          commits=$(jq -c '.commits[]?' "$GITHUB_EVENT_PATH" || echo "")
+          if [ -z "$commits" ]; then
+            echo "❌ No commits found — maybe an empty push?"
+            exit 0
+          fi
+
+          echo "🔍 Found commits:"
+          echo "$commits"
+
           count=$(echo "$commits" | wc -l)
-          for commit in $commits; do
-            COMMIT_MSG=$(echo $commit | jq -r '.message')
-            COMMIT_URL=$(echo $commit | jq -r '.url')
-            COMMIT_HASH=$(echo $commit | jq -r '.id' | cut -c1-7)
-            AUTHOR_NAME=$(echo $commit | jq -r '.author.name')
+
+          echo "$commits" | while IFS= read -r commit; do
+            COMMIT_MSG=$(echo "$commit" | jq -r '.message')
+            COMMIT_URL=$(echo "$commit" | jq -r '.url')
+            COMMIT_HASH=$(echo "$commit" | jq -r '.id' | cut -c1-7)
+            AUTHOR_NAME=$(echo "$commit" | jq -r '.author.name')
 
             curl -s -H "Content-Type: application/json" \
-            -X POST \
-            -d '{
-              "username": "GitHub",
-              "avatar_url": "https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png",
-              "embeds": [{
-                "author": {
-                  "name": "'"$AUTHOR_NAME"'",
-                  "icon_url": "'"$AUTHOR_AVATAR"'"
-                },
-                "title": "[${REPO_NAME##*/}:$BRANCH_NAME] '"$count"' new commit(s)",
-                "url": "'"$COMMIT_URL"'",
-                "color": 7506394,
-                "description": "```'"$COMMIT_HASH"'``` '"${COMMIT_MSG//\"/\\\"}"' – '"$AUTHOR_NAME"'"
-              }]
-            }' $DISCORD_WEBHOOK
+              -X POST \
+              -d '{
+                "username": "GitHub",
+                "avatar_url": "https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png",
+                "embeds": [{
+                  "author": {
+                    "name": "'"$AUTHOR_NAME"'",
+                    "icon_url": "'"$AUTHOR_AVATAR"'"
+                  },
+                  "title": "[${REPO_NAME##*/}:$BRANCH_NAME] '"$count"' new commit(s)",
+                  "url": "'"$COMMIT_URL"'",
+                  "color": 7506394,
+                  "description": "```'"$COMMIT_HASH"'``` '"${COMMIT_MSG//\"/\\\"}"' – '"$AUTHOR_NAME"'"
+                }]
+              }' $DISCORD_WEBHOOK
           done
